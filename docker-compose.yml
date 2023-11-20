@@ -1,0 +1,41 @@
+version: '3'
+services:
+  grafana:
+    image: grafana/grafana:9.5.14
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+  prometheus:
+    image: bitnami/prometheus:2.48.0
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/config:/opt/bitnami/prometheus/conf
+      - prometheus-storage:/opt/bitnami/prometheus/data
+  speedtest-exporter:
+    image: miguelndecarvalho/speedtest-exporter
+    container_name: speedtest-exporter
+    ports:
+      - 9798:9798
+    restart: unless-stopped
+  ping:
+    image: prom/blackbox-exporter:latest
+    restart: always
+    volumes:
+      - ./blackbox/config:/config
+    expose:
+      - 9115
+    ports:
+      - 9115:9115
+    tty: true
+    stdin_open: true
+    command:
+      - '--config.file=/config/blackbox.yml'
+volumes:
+  grafana-storage: {}
+  prometheus-storage: {}

@@ -1,0 +1,40 @@
+# my global config
+global:
+  scrape_interval: 15s
+  evaluation_interval: 30s
+
+scrape_configs:
+
+  - job_name: 'prometheus'
+    scrape_interval: 30s
+    static_configs:
+      - targets: 
+        - 'localhost:9090'
+      
+  - job_name: 'speedtest-exporter'
+    scrape_interval: 1m
+    scrape_timeout: 1m
+    static_configs:
+      - targets: 
+        - 'speedtest-exporter:9798'  
+
+  - job_name: 'ping'
+    metrics_path: /probe
+    scrape_interval: 30s
+    params:
+      module: [http_2xx]  # Look for a HTTP 200 response.
+    static_configs:
+      - targets: 
+        - 'https://google.com'
+        - 'https://facebook.com'
+        - 'https://twitter.com'
+        - 'http://google.com'
+        - 'http://facebook.com'
+        - 'http://twitter.com'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: ping:9115  # The blackbox exporter's real hostname:port.
