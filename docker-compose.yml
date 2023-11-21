@@ -25,7 +25,8 @@ services:
     restart: unless-stopped
   ping:
     image: prom/blackbox-exporter:latest
-    restart: always
+    container_name: ping
+    restart: unless-stopped
     volumes:
       - ./blackbox/config:/config
     expose:
